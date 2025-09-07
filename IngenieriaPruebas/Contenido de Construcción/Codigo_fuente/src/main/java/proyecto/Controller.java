@@ -23,6 +23,10 @@ public class Controller {
         return a - b;
     }
 
+    public int multiplicar(int a, int b){
+        return a * b;
+    }
+
     @FXML
     private void sumar() {
         try {
@@ -41,6 +45,18 @@ public class Controller {
             int b = Integer.parseInt(inputB.getText());
             lblResultado.setText("Resultado: " + restar(a, b));
         } catch (NumberFormatException e) {
+            lblResultado.setText("Ingrese números válidos");
+        }
+    }
+
+    @FXML
+    private void multiplicar(){
+        try{
+            int a = Integer.parseInt(inputA.getText());
+            int b = Integer.parseInt(inputB.getText());
+        lblResultado.setText("Resultado: " + multiplicar(a, b));
+        } catch (NumberFormatException e) 
+        {
             lblResultado.setText("Ingrese números válidos");
         }
     }
