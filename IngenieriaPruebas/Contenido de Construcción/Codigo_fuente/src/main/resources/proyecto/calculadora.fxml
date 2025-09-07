@@ -15,6 +15,7 @@
     
     <Button text="Sumar" layoutX="50" layoutY="120" fx:id="btnSumar" onAction="#sumar"/>
     <Button text="Restar" layoutX="200" layoutY="120" fx:id="btnRestar" onAction="#restar"/>
+    <Button text="Multiplicar" layoutX="300" layoutY="120" fx:id="btnMulti" onAction="#multi"/>
     
     <Label fx:id="lblResultado" text="Resultado:" layoutX="50" layoutY="180"/>
     
