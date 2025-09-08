@@ -1,0 +1,42 @@
+# -------------------------
+# Maven
+# -------------------------
+/target/
+dependency-reduced-pom.xml
+*.log
+*.class
+*.jar
+*.war
+*.ear
+
+# -------------------------
+# VS Code
+# -------------------------
+.vscode/
+.settings/
+.project
+.classpath
+
+# -------------------------
+# NetBeans
+# -------------------------
+nbactions.xml
+nb-configuration.xml
+nbproject/
+
+# -------------------------
+# OS / editor
+# -------------------------
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+*.iml
+
+# -------------------------
+# Optional build / temp files
+# -------------------------
+*.tmp
+*.bak
+*.old
