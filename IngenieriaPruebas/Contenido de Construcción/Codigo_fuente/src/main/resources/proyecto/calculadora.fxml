@@ -8,7 +8,7 @@
 <AnchorPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="proyecto.Controller" prefWidth="360" prefHeight="420">
     
-    <Label text="Calculadora Base" layoutX="28" layoutY="20" />
+    <Label text="Calculadora" layoutX="28" layoutY="20" />
     
     <TextField fx:id="inputA" layoutX="245" layoutY="45" prefWidth="100"/>
     <TextField fx:id="inputB" layoutX="245" layoutY="85" prefWidth="100"/>
