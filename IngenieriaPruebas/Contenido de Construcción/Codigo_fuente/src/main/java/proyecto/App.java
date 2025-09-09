@@ -11,6 +11,7 @@ public class App extends Application {
     public void start(Stage primaryStage) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/proyecto/calculadora.fxml"));
         Scene scene = new Scene(loader.load());
+        scene.getStylesheets().add(getClass().getResource("styles.css").toExternalForm());
         primaryStage.setTitle("Calculadora");
         primaryStage.setScene(scene);
         primaryStage.show();
