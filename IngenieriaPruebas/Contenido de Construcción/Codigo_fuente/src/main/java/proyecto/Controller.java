@@ -8,6 +8,13 @@ import javafx.scene.control.Button;
 import java.text.DecimalFormat;
 import java.util.Stack;
 
+import java.util.ArrayList;
+import java.util.List;
+import javafx.scene.control.Alert;
+import javafx.scene.Scene;
+import javafx.scene.control.ListView;
+import javafx.stage.Stage;
+
 public class Controller {
     private final DecimalFormat df = new DecimalFormat("0.00");
 
@@ -16,6 +23,9 @@ public class Controller {
 
     //Ultima expresion antes de error
     private String lastValidExpression = "";
+
+    //Array para guardar el historial
+    private List<String> historial = new ArrayList<>();
 
     @FXML private TextField screen;
 
@@ -64,7 +74,10 @@ public class Controller {
             double result = evaluarExpresion(expr);
 
             lastValidExpression = expr; // Guarda lo escrito antes del cálculo
+            String resultado = df.format(result);
+
             screen.setText(df.format(result));
+            historial.add(expr + " = " + resultado);
         } catch(Exception e){
             // Guarda lo último válido antes del error
             lastValidExpression = screen.getText();
@@ -77,7 +90,19 @@ public class Controller {
 
     @FXML
     private void historial() {
-        System.out.println("Historial...");
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Historial de Operaciones");
+        alert.setHeaderText("Últimas operaciones realizadas");
+
+        Stage historyStage = new Stage();
+        historyStage.setTitle("Historial de Operaciones");
+
+        ListView<String> listView = new ListView<>();
+        listView.getItems().addAll(historial);
+
+        Scene scene = new Scene(listView, 300, 400);
+        historyStage.setScene(scene);
+        historyStage.show();
     }
 
     @FXML
