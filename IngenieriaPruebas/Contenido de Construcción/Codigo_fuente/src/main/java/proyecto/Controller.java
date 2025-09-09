@@ -6,100 +6,119 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Button;
 
 import java.text.DecimalFormat;
+import java.util.Stack;
 
 public class Controller {
+    private final DecimalFormat df = new DecimalFormat("0.00");
 
-    @FXML
-    private TextField screen;
+    //Filtro de teclado, solo permite numeros y simbolos autorizados
+    private javafx.scene.control.TextFormatter<String> keybFormatter;
 
-    @FXML
-    private Button btnIgual;
-    @FXML
-    private Button btnSumar;
-    @FXML
-    private Button btnRestar;
-    @FXML
-    private Button btnMultiplicar;
-    @FXML
-    private Button btnDividir;
+    //Ultima expresion antes de error
+    private String lastValidExpression = "";
 
-    @FXML
-    private Button btnHistorial;
-    @FXML
-    private Button btnNueve;
-    @FXML
-    private Button btnSeis;
-    @FXML
-    private Button btnTres;
+    @FXML private TextField screen;
 
-    @FXML
-    private Button btnDelete;
-    @FXML
-    private Button btnOcho;
-    @FXML
-    private Button btnCinco;
-    @FXML
-    private Button btnDos;
-    @FXML
-    private Button btnPunto;
+    @FXML private void typeCero() { append("0"); }
+    @FXML private void typeUno() { append("1"); }
+    @FXML private void typeDos() { append("2"); }
+    @FXML private void typeTres() { append("3"); }
+    @FXML private void typeCuatro() { append("4"); }
+    @FXML private void typeCinco() { append("5"); }
+    @FXML private void typeSeis() { append("6"); }
+    @FXML private void typeSiete() { append("7"); }
+    @FXML private void typeOcho() { append("8"); }
+    @FXML private void typeNueve() { append("9"); }
+    @FXML private void typePunto() { append("."); }
 
-    @FXML
-    private Button btnClearAll;
-    @FXML
-    private Button btnSiete;
-    @FXML
-    private Button btnCuatro;
-    @FXML
-    private Button btnUno;
-    @FXML
-    private Button btnCero;
+    @FXML private void sumar() { append("+"); }
+    @FXML private void restar() { append("-"); }
+    @FXML private void multiplicar() { append("*"); }
+    @FXML private void dividir() { append("/"); }
 
-    /*
-    public int sumar(int a, int b) {
-        return a + b;
+    @FXML 
+    private void clearAll() {
+        screen.clear(); 
+        lastValidExpression = "";
     }
-
-    public int restar(int a, int b) {
-        return a - b;
-    }
-
-    public int multiplicar(int a, int b){
-        return a * b;
-    }
-
+    
     @FXML
-    private void sumar() {
-        try {
-            int a = Integer.parseInt(inputA.getText());
-            int b = Integer.parseInt(inputB.getText());
-            lblResultado.setText("Resultado: " + sumar(a, b));
-        } catch (NumberFormatException e) {
-            lblResultado.setText("Ingrese números válidos");
+    private void delete() {
+        String text = screen.getText();
+
+        if (text.equals("Error")) {
+            screen.setText(lastValidExpression);
+            return;
+        }
+
+        if (!text.isEmpty()){
+            screen.setText(text.substring(0, text.length() - 1));
+            lastValidExpression = screen.getText();
         }
     }
 
     @FXML
-    private void restar() {
-        try {
-            int a = Integer.parseInt(inputA.getText());
-            int b = Integer.parseInt(inputB.getText());
-            lblResultado.setText("Resultado: " + restar(a, b));
-        } catch (NumberFormatException e) {
-            lblResultado.setText("Ingrese números válidos");
-        }
-    }
-
-    @FXML
-    private void multiplicar(){
+    private void igual() {
         try{
-            int a = Integer.parseInt(inputA.getText());
-            int b = Integer.parseInt(inputB.getText());
-        lblResultado.setText("Resultado: " + multiplicar(a, b));
-        } catch (NumberFormatException e) 
-        {
-            lblResultado.setText("Ingrese números válidos");
+            String expr = screen.getText();
+            double result = evaluarExpresion(expr);
+
+            lastValidExpression = expr; // Guarda lo escrito antes del cálculo
+            screen.setText(df.format(result));
+        } catch(Exception e){
+            // Guarda lo último válido antes del error
+            lastValidExpression = screen.getText();
+
+            screen.setTextFormatter(null);
+            screen.setText("Error");
+            screen.setTextFormatter(keybFormatter);
         }
-    }*/
+    }
+
+    @FXML
+    private void historial() {
+        System.out.println("Historial...");
+    }
+
+    @FXML
+    private void initialize() {
+        keybFormatter = new javafx.scene.control.TextFormatter<>(change -> {
+            String newText = change.getControlNewText();
+            
+            //Solo permitir caracteres validos
+            if (!newText.matches("[0-9+\\-*/.]*")){
+                return null;
+            }
+
+            //Evitar doble punto
+            // Divide la expresión en tokens (números) separados por operadores
+            String[] tokens = newText.split("[+\\-*/]");
+
+            for (String token : tokens) {
+                // Si un número tiene más de un punto, es inválido
+                if (token.chars().filter(ch -> ch == '.').count() > 1) {
+                    return null;
+                }
+            }
+
+            return change;
+        });
+
+        screen.setTextFormatter(keybFormatter);
+    }
+
+    // Helper para escribir
+    private void append(String value) {
+        if (screen.getText().equals("Error")) {
+            screen.setText(""); // limpia error antes de escribir
+        }
+        screen.appendText(value);
+        lastValidExpression = screen.getText();
+    }
+
+    //---------------------
+    //PARSER DE EXPRESIONES
+    //---------------------
     private double evaluarExpresion(String expr) {
         try {
             java.util.Stack<Double> valores = new java.util.Stack<>();
@@ -159,18 +178,13 @@ public class Controller {
             case '+': return a + b;
             case '-': return a - b;
             case '*': return a * b;
-            case '/': return a / b;
+            case '/': 
+                if (b == 0){
+                    throw new ArithmeticException("Division por cero");
+                }
+                return a / b;
         }
         return 0;
     }
-    
-    @FXML
-    private void igual() {
-        try {
-            double result = evaluarExpresion(screen.getText());
-            screen.setText(df.format(result));
-        } catch (Exception e) {
-            screen.setText("Error");
-    }
-}
+    //----------------------
 }
