@@ -37,19 +37,19 @@
         </rowConstraints>
 
         <!-- Fila 0: Memoria -->    
-        <Button text="M+" fx:id="btnMPlus"   
+        <Button text="M+" fx:id="btnMPlus" onAction="#memoryAdd"   
                 GridPane.rowIndex="0" GridPane.columnIndex="0"
                 prefWidth="60" prefHeight="30"
                 style="-fx-background-radius: 6; -fx-font-size: 12px;"/><!-- memoryAdd -->
-        <Button text="M-" fx:id="btnMMinus" 
+        <Button text="M-" fx:id="btnMMinus" onAction="#memorySubs"
                 GridPane.rowIndex="0" GridPane.columnIndex="1"
                 prefWidth="60" prefHeight="30"
                 style="-fx-background-radius: 6; -fx-font-size: 12px;"/><!-- memorySubtract -->
-        <Button text="MC" fx:id="btnMC" 
+        <Button text="MC" fx:id="btnMC" onAction="#memoryClear"
                 GridPane.rowIndex="0" GridPane.columnIndex="2"
                 prefWidth="60" prefHeight="30"
                 style="-fx-background-radius: 6; -fx-font-size: 12px;"/><!-- memoryClear -->
-        <Button text="MR" fx:id="btnMR"
+        <Button text="MR" fx:id="btnMR" onAction="#memoryRecov"
                 GridPane.rowIndex="0" GridPane.columnIndex="3"
                 prefWidth="60" prefHeight="30"
                 style="-fx-background-radius: 6; -fx-font-size: 12px;"/><!-- memoryRecall -->

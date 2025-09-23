@@ -17,6 +17,7 @@ import javafx.stage.Stage;
 
 public class Controller {
     private final DecimalFormat df = new DecimalFormat("0.00");
+    private double memoryValue = 0.0;
 
     //Filtro de teclado, solo permite numeros y simbolos autorizados
     private javafx.scene.control.TextFormatter<String> keybFormatter;
@@ -103,6 +104,36 @@ public class Controller {
         Scene scene = new Scene(listView, 300, 400);
         historyStage.setScene(scene);
         historyStage.show();
+    }
+
+    @FXML
+    private void memoryAdd() {
+        try {
+            double current = evaluarExpresion(screen.getText());
+            memoryValue += current;
+        } catch (Exception e) {
+    }
+    }
+
+    @FXML
+    private void memorySubs() {
+        try {
+            double current = evaluarExpresion(screen.getText());
+            memoryValue -= current;
+            } catch (Exception e) {
+        }
+    }
+
+    @FXML
+    private void memoryClear() {
+        memoryValue = 0.0;
+    }
+
+    @FXML
+    private void memoryRecov() {
+        // Recupera el valor almacenado y lo muestra
+        screen.setText(df.format(memoryValue));
+        lastValidExpression = screen.getText();
     }
 
     @FXML
