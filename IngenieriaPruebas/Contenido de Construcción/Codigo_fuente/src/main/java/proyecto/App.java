@@ -13,6 +13,12 @@ public class App extends Application {
         Scene scene = new Scene(loader.load());
         scene.getStylesheets().add(getClass().getResource("styles.css").toExternalForm());
         primaryStage.setTitle("Calculadora");
+
+        // Fijar tamaño
+    primaryStage.setResizable(false);   // Bloquea el redimensionamiento
+    primaryStage.setWidth(375);         // opcional, ancho exacto
+    primaryStage.setHeight(515);        // opcional, alto exacto
+
         primaryStage.setScene(scene);
         primaryStage.show();
     }

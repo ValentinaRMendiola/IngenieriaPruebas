@@ -17,6 +17,7 @@ import javafx.stage.Stage;
 
 public class Controller {
     private final DecimalFormat df = new DecimalFormat("0.00");
+    private double memoryValue = 0.0;
 
     //Filtro de teclado, solo permite numeros y simbolos autorizados
     private javafx.scene.control.TextFormatter<String> keybFormatter;
@@ -106,6 +107,48 @@ public class Controller {
     }
 
     @FXML
+    private void memoryAdd() {
+        try {
+            double current;
+            try {
+                current = evaluarExpresion(screen.getText());
+            } catch (Exception e) {
+                current = Double.parseDouble(screen.getText()); // fallback directo
+            }
+            memoryValue += current;
+        } catch (Exception e) {
+            // ignorar error
+        }
+    }
+
+    @FXML
+    private void memorySubs() {
+        try {
+            double current;
+            try {
+                current = evaluarExpresion(screen.getText());
+            } catch (Exception e) {
+                current = Double.parseDouble(screen.getText()); // fallback directo
+            }
+            memoryValue -= current;
+        } catch (Exception e) {
+            // ignorar error
+        }
+    }
+
+    @FXML
+    private void memoryClear() {
+        memoryValue = 0.0;
+    }
+
+    @FXML
+    private void memoryRecov() {
+        // Recupera el valor almacenado y lo muestra
+        screen.setText(df.format(memoryValue));
+        lastValidExpression = screen.getText();
+    }
+
+    @FXML
     private void initialize() {
         keybFormatter = new javafx.scene.control.TextFormatter<>(change -> {
             String newText = change.getControlNewText();
@@ -124,6 +167,11 @@ public class Controller {
                 if (token.chars().filter(ch -> ch == '.').count() > 1) {
                     return null;
                 }
+            }
+
+            // Evitar operadores repetidos (++, --, **, //)
+            if (newText.matches(".*([+\\-*/])\\1.*")) {
+                return null;
             }
 
             return change;
@@ -175,10 +223,23 @@ public class Controller {
                 }
                 // Si es operador
                 else if (c == '+' || c == '-' || c == '*' || c == '/') {
-                    while (!ops.isEmpty() && precedencia(ops.peek()) >= precedencia(c)) {
-                        valores.push(aplicarOp(ops.pop(), valores.pop(), valores.pop()));
+                    // Caso especial: '-' unario (número negativo)
+                    if (c == '-' && (i == 0 || expr.charAt(i - 1) == '(' || expr.charAt(i - 1) == '+' 
+                    || expr.charAt(i - 1) == '-' || expr.charAt(i - 1) == '*' || expr.charAt(i - 1) == '/')) {
+                        StringBuilder num = new StringBuilder("-");
+                        i++;
+                        while (i < expr.length() && (Character.isDigit(expr.charAt(i)) || expr.charAt(i) == '.')) {
+                            num.append(expr.charAt(i));
+                            i++;
+                        }
+                        valores.push(Double.parseDouble(num.toString()));
+                        i--; // retroceder porque el for avanzará
+                    } else {
+                        while (!ops.isEmpty() && precedencia(ops.peek()) >= precedencia(c)) {
+                            valores.push(aplicarOp(ops.pop(), valores.pop(), valores.pop()));
+                        }
+                        ops.push(c);
                     }
-                    ops.push(c);
                 }
             }
 
