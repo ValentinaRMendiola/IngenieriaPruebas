@@ -15,7 +15,7 @@
                style="-fx-font-size: 20px; -fx-alignment: center-right;" />
 
     <!-- Teclado -->
-    <GridPane layoutX="20" layoutY="100" prefWidth="320" prefHeight="300"
+    <GridPane layoutX="20" layoutY="100" prefWidth="320" prefHeight="380"
               hgap="10" vgap="10">
 
         <!-- Columnas: 4 iguales -->
@@ -28,80 +28,98 @@
 
         <!-- Filas: 5 iguales -->
         <rowConstraints>
-            <RowConstraints percentHeight="20" vgrow="ALWAYS"/>
-            <RowConstraints percentHeight="20" vgrow="ALWAYS"/>
-            <RowConstraints percentHeight="20" vgrow="ALWAYS"/>
-            <RowConstraints percentHeight="20" vgrow="ALWAYS"/>
-            <RowConstraints percentHeight="20" vgrow="ALWAYS"/>
+            <RowConstraints percentHeight="12" vgrow="ALWAYS"/>
+            <RowConstraints percentHeight="16" vgrow="ALWAYS"/>
+            <RowConstraints percentHeight="16" vgrow="ALWAYS"/>
+            <RowConstraints percentHeight="16" vgrow="ALWAYS"/>
+            <RowConstraints percentHeight="16" vgrow="ALWAYS"/>
+            <RowConstraints percentHeight="16" vgrow="ALWAYS"/>
         </rowConstraints>
+
+        <!-- Fila 0: Memoria -->    
+        <Button text="M+" fx:id="btnMPlus"   
+                GridPane.rowIndex="0" GridPane.columnIndex="0"
+                prefWidth="60" prefHeight="30"
+                style="-fx-background-radius: 6; -fx-font-size: 12px;"/><!-- memoryAdd -->
+        <Button text="M-" fx:id="btnMMinus" 
+                GridPane.rowIndex="0" GridPane.columnIndex="1"
+                prefWidth="60" prefHeight="30"
+                style="-fx-background-radius: 6; -fx-font-size: 12px;"/><!-- memorySubtract -->
+        <Button text="MC" fx:id="btnMC" 
+                GridPane.rowIndex="0" GridPane.columnIndex="2"
+                prefWidth="60" prefHeight="30"
+                style="-fx-background-radius: 6; -fx-font-size: 12px;"/><!-- memoryClear -->
+        <Button text="MR" fx:id="btnMR"
+                GridPane.rowIndex="0" GridPane.columnIndex="3"
+                prefWidth="60" prefHeight="30"
+                style="-fx-background-radius: 6; -fx-font-size: 12px;"/><!-- memoryRecall -->
 
         <!-- Fila 1 -->
         <Button text="AC" fx:id="btnClearAll" onAction="#clearAll"
-                GridPane.rowIndex="0" GridPane.columnIndex="0"
+                GridPane.rowIndex="1" GridPane.columnIndex="0"
                 maxWidth="Infinity" maxHeight="Infinity"/>
         <Button text="⌫" fx:id="btnDelete" onAction="#delete"
-                GridPane.rowIndex="0" GridPane.columnIndex="1"
+                GridPane.rowIndex="1" GridPane.columnIndex="1"
                 maxWidth="Infinity" maxHeight="Infinity"/>
         <Button text="Hist" fx:id="btnHistorial" onAction="#historial"
-                GridPane.rowIndex="0" GridPane.columnIndex="2"
+                GridPane.rowIndex="1" GridPane.columnIndex="2"
                 maxWidth="Infinity" maxHeight="Infinity"/>
         <Button text="÷" fx:id="btnDividir" onAction="#dividir"
-                GridPane.rowIndex="0" GridPane.columnIndex="3"
+                GridPane.rowIndex="1" GridPane.columnIndex="3"
                 maxWidth="Infinity" maxHeight="Infinity"/>
 
         <!-- Fila 2 -->
         <Button text="7" fx:id="btnSiete" onAction="#typeSiete"
-                GridPane.rowIndex="1" GridPane.columnIndex="0"
+                GridPane.rowIndex="2" GridPane.columnIndex="0"
                 maxWidth="Infinity" maxHeight="Infinity"/>
         <Button text="8" fx:id="btnOcho" onAction="#typeOcho"
-                GridPane.rowIndex="1" GridPane.columnIndex="1"
+                GridPane.rowIndex="2" GridPane.columnIndex="1"
                 maxWidth="Infinity" maxHeight="Infinity"/>
         <Button text="9" fx:id="btnNueve" onAction="#typeNueve"
-                GridPane.rowIndex="1" GridPane.columnIndex="2"
+                GridPane.rowIndex="2" GridPane.columnIndex="2"
                 maxWidth="Infinity" maxHeight="Infinity"/>
         <Button text="X" fx:id="btnMultiplicar" onAction="#multiplicar"
-                GridPane.rowIndex="1" GridPane.columnIndex="3"
+                GridPane.rowIndex="2" GridPane.columnIndex="3"
                 maxWidth="Infinity" maxHeight="Infinity"/>
 
         <!-- Fila 3 -->
         <Button text="4" fx:id="btnCuatro" onAction="#typeCuatro"
-                GridPane.rowIndex="2" GridPane.columnIndex="0"
+                GridPane.rowIndex="3" GridPane.columnIndex="0"
                 maxWidth="Infinity" maxHeight="Infinity"/>
         <Button text="5" fx:id="btnCinco" onAction="#typeCinco"
-                GridPane.rowIndex="2" GridPane.columnIndex="1"
+                GridPane.rowIndex="3" GridPane.columnIndex="1"
                 maxWidth="Infinity" maxHeight="Infinity"/>
         <Button text="6" fx:id="btnSeis" onAction="#typeSeis"
-                GridPane.rowIndex="2" GridPane.columnIndex="2"
+                GridPane.rowIndex="3" GridPane.columnIndex="2"
                 maxWidth="Infinity" maxHeight="Infinity"/>
         <Button text="-" fx:id="btnRestar" onAction="#restar"
-                GridPane.rowIndex="2" GridPane.columnIndex="3"
+                GridPane.rowIndex="3" GridPane.columnIndex="3"
                 maxWidth="Infinity" maxHeight="Infinity"/>
 
         <!-- Fila 4 -->
         <Button text="1" fx:id="btnUno" onAction="#typeUno"
-                GridPane.rowIndex="3" GridPane.columnIndex="0"
+                GridPane.rowIndex="4" GridPane.columnIndex="0"
                 maxWidth="Infinity" maxHeight="Infinity"/>
         <Button text="2" fx:id="btnDos" onAction="#typeDos"
-                GridPane.rowIndex="3" GridPane.columnIndex="1"
+                GridPane.rowIndex="4" GridPane.columnIndex="1"
                 maxWidth="Infinity" maxHeight="Infinity"/>
         <Button text="3" fx:id="btnTres" onAction="#typeTres"
-                GridPane.rowIndex="3" GridPane.columnIndex="2"
+                GridPane.rowIndex="4" GridPane.columnIndex="2"
                 maxWidth="Infinity" maxHeight="Infinity"/>
         <Button text="+" fx:id="btnSumar" onAction="#sumar"
-                GridPane.rowIndex="3" GridPane.columnIndex="3"
+                GridPane.rowIndex="4" GridPane.columnIndex="3"
                 maxWidth="Infinity" maxHeight="Infinity"/>
 
         <!-- Fila 5 -->
         <Button text="0" fx:id="btnCero" onAction="#typeCero"
-                GridPane.rowIndex="4" GridPane.columnIndex="0"
-                GridPane.columnSpan="2"
+                GridPane.rowIndex="5" GridPane.columnIndex="0" GridPane.columnSpan="2"
                 maxWidth="Infinity" maxHeight="Infinity"/>
         <Button text="." fx:id="btnPunto" onAction="#typePunto"
-                GridPane.rowIndex="4" GridPane.columnIndex="2"
+                GridPane.rowIndex="5" GridPane.columnIndex="2"
                 maxWidth="Infinity" maxHeight="Infinity"/>
         <Button text="=" fx:id="btnIgual" onAction="#igual"
-                GridPane.rowIndex="4" GridPane.columnIndex="3"
+                GridPane.rowIndex="5" GridPane.columnIndex="3"
                 maxWidth="Infinity" maxHeight="Infinity"/>
-    </GridPane>
 
+    </GridPane>
 </AnchorPane>
