@@ -57,7 +57,12 @@ public class Controller {
 
     @FXML 
     private void percentage() {
-        
+        String text = screen.getText();
+
+        // Evitar doble porcentaje consecutivo
+        if (!text.endsWith("%")) {
+            screen.appendText("%");
+        }
     }
 
     @FXML 
@@ -86,6 +91,10 @@ public class Controller {
         try{
             String expr = screen.getText();
             expr = expr.replace("÷", "/").replace("×", "*");
+
+            // Manejar porcentajes
+            // Reemplaza "n%" por "(n/100)"
+            expr = expr.replaceAll("(-?\\d+(?:\\.\\d+)?)%", "($1/100)");
 
             double result = evaluarExpresion(expr);
 
@@ -198,7 +207,7 @@ public class Controller {
             }
 
             //Solo permitir caracteres validos
-            if (!newText.matches("[0-9+\\-*/÷×.]*")){
+            if (!newText.matches("[0-9+\\-*/÷×%.]*")){
                 return null;
             }
 
@@ -214,7 +223,7 @@ public class Controller {
             }
 
             // Evitar operadores repetidos (++, --, **, //)
-            if (newText.matches(".*([+\\-*/÷×])\\1.*")) {
+            if (newText.matches(".*([+\\-*/÷×%])\\1.*")) {
                 return null;
             }
 
