@@ -78,7 +78,7 @@
         <Button text="9" fx:id="btnNueve" onAction="#typeNueve"
                 GridPane.rowIndex="2" GridPane.columnIndex="2"
                 maxWidth="Infinity" maxHeight="Infinity"/>
-        <Button text="X" fx:id="btnMultiplicar" onAction="#multiplicar"
+        <Button text="×" fx:id="btnMultiplicar" onAction="#multiplicar"
                 GridPane.rowIndex="2" GridPane.columnIndex="3"
                 maxWidth="Infinity" maxHeight="Infinity"/>
 
