@@ -15,6 +15,12 @@ import javafx.scene.Scene;
 import javafx.scene.control.ListView;
 import javafx.stage.Stage;
 
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+
 public class Controller {
     private final DecimalFormat df = new DecimalFormat("0.00");
     private double memoryValue = 0.0;
@@ -27,6 +33,8 @@ public class Controller {
 
     //Array para guardar el historial
     private List<String> historial = new ArrayList<>();
+
+    final int MAX_DIGITS = 28;
 
     @FXML private TextField screen;
 
@@ -44,8 +52,18 @@ public class Controller {
 
     @FXML private void sumar() { append("+"); }
     @FXML private void restar() { append("-"); }
-    @FXML private void multiplicar() { append("*"); }
-    @FXML private void dividir() { append("/"); }
+    @FXML private void multiplicar() { screen.appendText("×"); }
+    @FXML private void dividir() { screen.appendText("÷"); }
+
+    @FXML 
+    private void percentage() {
+        String text = screen.getText();
+
+        // Evitar doble porcentaje consecutivo
+        if (!text.endsWith("%")) {
+            screen.appendText("%");
+        }
+    }
 
     @FXML 
     private void clearAll() {
@@ -72,13 +90,25 @@ public class Controller {
     private void igual() {
         try{
             String expr = screen.getText();
+            expr = expr.replace("÷", "/").replace("×", "*");
+
+            // Manejar porcentajes
+            // Reemplaza "n%" por "(n/100)"
+            expr = expr.replaceAll("(-?\\d+(?:\\.\\d+)?)%", "($1/100)");
+
             double result = evaluarExpresion(expr);
 
-            lastValidExpression = expr; // Guarda lo escrito antes del cálculo
             String resultado = df.format(result);
+            // Verificar límite de caracteres
+            if (resultado.length() > MAX_DIGITS) {
+                throw new RuntimeException("Excede el limite de digitos.");
+            }
 
+            lastValidExpression = expr; // Guarda lo escrito antes del cálculo
+            
             screen.setText(df.format(result));
             historial.add(expr + " = " + resultado);
+
         } catch(Exception e){
             // Guarda lo último válido antes del error
             lastValidExpression = screen.getText();
@@ -91,19 +121,29 @@ public class Controller {
 
     @FXML
     private void historial() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Historial de Operaciones");
-        alert.setHeaderText("Últimas operaciones realizadas");
-
         Stage historyStage = new Stage();
-        historyStage.setTitle("Historial de Operaciones");
+        historyStage.setTitle("Historial de operaciones");
+        historyStage.setResizable(false);
 
-        ListView<String> listView = new ListView<>();
-        listView.getItems().addAll(historial);
+        VBox content = new VBox(10);
+        content.setPadding(new Insets(10));
+        content.setAlignment(Pos.TOP_LEFT);
 
-        Scene scene = new Scene(listView, 300, 400);
+        for (String entry : historial) {
+            Label lbl = new Label(entry);
+            lbl.setStyle("-fx-font-size: 14px;");
+            content.getChildren().add(lbl);
+        }
+
+        ScrollPane scroll = new ScrollPane(content);
+        scroll.setFitToWidth(true);
+
+        Scene scene = new Scene(scroll, 300, 400);
         historyStage.setScene(scene);
-        historyStage.show();
+
+        // 👇 Hace que el historial sea modal
+        historyStage.initModality(Modality.APPLICATION_MODAL);
+        historyStage.showAndWait(); // Bloquea la calculadora hasta cerrar
     }
 
     @FXML
@@ -151,10 +191,23 @@ public class Controller {
     @FXML
     private void initialize() {
         keybFormatter = new javafx.scene.control.TextFormatter<>(change -> {
+            
+            if (change.getText().equals("/")) {
+                change.setText("÷");
+            }
+            if (change.getText().equals("*")) {
+                change.setText("×");
+            }
+
             String newText = change.getControlNewText();
             
+            // Limitar cantidad de caracteres
+            if (newText.length() > MAX_DIGITS) {
+                return null;
+            }
+
             //Solo permitir caracteres validos
-            if (!newText.matches("[0-9+\\-*/.]*")){
+            if (!newText.matches("[0-9+\\-*/÷×%.]*")){
                 return null;
             }
 
@@ -170,7 +223,7 @@ public class Controller {
             }
 
             // Evitar operadores repetidos (++, --, **, //)
-            if (newText.matches(".*([+\\-*/])\\1.*")) {
+            if (newText.matches(".*([+\\-*/÷×%])\\1.*")) {
                 return null;
             }
 
@@ -194,6 +247,7 @@ public class Controller {
     //---------------------
     private double evaluarExpresion(String expr) {
         try {
+            expr = expr.replace("×", "*").replace("÷", "/");
             java.util.Stack<Double> valores = new java.util.Stack<>();
             java.util.Stack<Character> ops = new java.util.Stack<>();
 
@@ -204,8 +258,10 @@ public class Controller {
                 if (c == ' ') continue;
 
                 // Si es número (puede tener varios dígitos)
-                if (Character.isDigit(c) || c == '.') {
+                if (Character.isDigit(c) || c == '.' || (c == '-' && (i == 0 || "+-*/(".indexOf(expr.charAt(i - 1)) != -1))) {
                     StringBuilder sb = new StringBuilder();
+                    if (c == '-') sb.append('-'); // signo negativo
+                    if (c == '-') i++;
                     while (i < expr.length() && (Character.isDigit(expr.charAt(i)) || expr.charAt(i) == '.')) {
                         sb.append(expr.charAt(i++));
                     }
@@ -223,23 +279,10 @@ public class Controller {
                 }
                 // Si es operador
                 else if (c == '+' || c == '-' || c == '*' || c == '/') {
-                    // Caso especial: '-' unario (número negativo)
-                    if (c == '-' && (i == 0 || expr.charAt(i - 1) == '(' || expr.charAt(i - 1) == '+' 
-                    || expr.charAt(i - 1) == '-' || expr.charAt(i - 1) == '*' || expr.charAt(i - 1) == '/')) {
-                        StringBuilder num = new StringBuilder("-");
-                        i++;
-                        while (i < expr.length() && (Character.isDigit(expr.charAt(i)) || expr.charAt(i) == '.')) {
-                            num.append(expr.charAt(i));
-                            i++;
-                        }
-                        valores.push(Double.parseDouble(num.toString()));
-                        i--; // retroceder porque el for avanzará
-                    } else {
-                        while (!ops.isEmpty() && precedencia(ops.peek()) >= precedencia(c)) {
-                            valores.push(aplicarOp(ops.pop(), valores.pop(), valores.pop()));
-                        }
-                        ops.push(c);
+                    while (!ops.isEmpty() && precedencia(ops.peek()) >= precedencia(c)) {
+                        valores.push(aplicarOp(ops.pop(), valores.pop(), valores.pop()));
                     }
+                    ops.push(c);
                 }
             }
 
