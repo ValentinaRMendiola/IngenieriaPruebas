@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Tienda Vinil Clásico — VinylShop</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- EmailJS SDK (opcional) -->
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="brand">
+        <div class="logo-vinyl" aria-hidden="true"></div>
+        <h1>VinylShop</h1>
+        <p class="tag">Vinilos — Clásicos & Ediciones</p>
+      </div>
+
+      <nav class="nav">
+        <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">☰</button>
+        <ul class="nav-list" id="navList">
+          <li><a href="#home" class="nav-link">Inicio</a></li>
+          <li><a href="#productos" class="nav-link">Productos</a></li>
+          <li><a href="#contacto" class="nav-link">Contacto</a></li>
+          <li><a href="#" id="loginBtn" class="nav-link">Iniciar sesión</a></li>
+          <li><a href="#" id="cartBtn" class="nav-link">Carrito (<span id="cartCount">0</span>)</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero -->
+    <section id="home" class="hero">
+      <div class="container hero-inner">
+        <h2>La música en su forma más auténtica</h2>
+        <p>Vinilos seleccionados, ediciones clásicas y atención personalizada. Explora nuestra colección.</p>
+        <a href="#productos" class="btn">Ver vinilos</a>
+      </div>
+    </section>
+
+    <!-- Products -->
+    <section id="productos" class="products container">
+      <h3>Nuestros vinilos</h3>
+      <div id="productGrid" class="product-grid">
+        <!-- Productos se renderizan desde script.js -->
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contacto" class="contact container">
+      <h3>Contacto</h3>
+      <p>Tel: +52 55 12 34 56 78 · Email: contactoVinyl@gmail.com</p>
+      <p>Dirección: Ciudad, México</p>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© <span id="year"></span> VinylShop — Tienda de vinilos</p>
+      <small>Cualquier queja, dejar mensaje a Vale que es jefa</small>
+    </div>
+  </footer>
+
+  <!-- Login / Register Modal -->
+  <div class="modal hidden" id="authModal" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <button class="modal-close" id="closeAuth" aria-label="Cerrar">✕</button>
+      <div class="auth-tabs">
+        <button id="tabLogin" class="active">Iniciar sesión</button>
+        <button id="tabRegister">Registrarse</button>
+      </div>
+      <div id="loginForm" class="auth-form">
+        <h4>Inicia sesión</h4>
+        <label>Email
+          <input id="loginEmail" type="email" placeholder="E-mail" />
+        </label>
+        <label>Contraseña
+          <input id="loginPassword" type="password" placeholder="******" />
+        </label>
+        <button id="doLogin" class="btn">Entrar</button>
+      </div>
+      <div id="registerForm" class="auth-form hidden">
+        <h4>Regístrate</h4>
+        <label>Nombre
+          <input id="regName" type="text" placeholder="Tu nombre" />
+        </label>
+        <label>Email
+          <input id="regEmail" type="email" placeholder="correo@ejemplo.com" />
+        </label>
+        <label>Contraseña
+          <input id="regPassword" type="password" placeholder="******" />
+        </label>
+        <button id="doRegister" class="btn">Crear cuenta</button>
+      </div>
+      <p class="auth-note">Los datos se guardan localmente.</p>
+    </div>
+  </div>
+
+  <!-- Cart Sidebar -->
+  <aside class="cart-panel hidden" id="cartPanel" aria-hidden="true">
+    <div class="cart-header">
+      <h4>Carrito</h4>
+      <button id="closeCart" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="cart-body" id="cartItems">
+      <!-- Items renderizados en script -->
+    </div>
+    <div class="cart-footer">
+      <div class="cart-summary">
+        <span>Total:</span>
+        <strong id="cartTotal">$0.00</strong>
+      </div>
+      <button id="checkoutBtn" class="btn">Pagar y enviar ticket</button>
+      <small class="cart-note">El ticket será enviado al correo con el que inicies sesión.</small>
+    </div>
+  </aside>
+
+  <!-- Recommendation Modal -->
+  <div class="modal hidden" id="recommendModal" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <button class="modal-close" id="closeRecommend" aria-label="Cerrar">✕</button>
+      <h4>Recomendación para ti</h4>
+      <div id="recommendationContent"></div>
+      <button id="goToProducts" class="btn">Ver producto recomendado</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
