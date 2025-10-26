@@ -247,32 +247,71 @@
     else localStorage.removeItem(userKey);
   }
 
-  function registerUser(name, email, password) {
-    // guardamos usuarios en una lista simple (localStorage). No seguro, solo proyecto.
-    const usersRaw = localStorage.getItem("mv_users");
-    const users = usersRaw ? JSON.parse(usersRaw) : [];
-    if (users.find(u => u.email === email)) {
-      alert("Ya existe una cuenta con ese correo.");
+  async function checkSession() {
+    try {
+      const res = await fetch('api/current_user.php', { credentials: 'same-origin' });
+      const data = await res.json();
+      if (data && data.user) {
+        currentUser = data.user;
+        saveUserToStorage(); // optional: keep local copy to persist UI quickly
+      } else {
+        currentUser = null;
+        saveUserToStorage();
+      }
+      onUserChanged();
+    } catch (err) {
+      console.error('Sesion check error:', err);
+      }
+  }
+
+  async function registerUser(name, email, password) {
+    try {
+      const res = await fetch('api/register.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ name, email, password })
+      });
+      const data = await res.json();
+      if (!data.ok) {
+        alert(data.msg || 'Error al registrar');
+        return false;
+      }
+      currentUser = data.user;
+      saveUserToStorage();
+      return true;
+    } catch (e) {
+      console.error(e);
+      alert('Error de conexión al registrar');
       return false;
     }
-    users.push({ name, email, password });
-    localStorage.setItem("mv_users", JSON.stringify(users));
-    currentUser = { name, email };
-    saveUserToStorage();
-    return true;
   }
 
-  function loginUser(email, password) {
-    const usersRaw = localStorage.getItem("mv_users");
-    const users = usersRaw ? JSON.parse(usersRaw) : [];
-    const u = users.find(x => x.email === email && x.password === password);
-    if (!u) return false;
-    currentUser = { name: u.name, email: u.email };
-    saveUserToStorage();
-    return true;
+  async function loginUser(email, password) {
+    try {
+      const res = await fetch('api/login.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+      if (!data.ok) {
+        return false;
+      }
+      currentUser = data.user;
+      saveUserToStorage();
+      return true;
+    } catch (e) {
+      console.error(e);
+      return false;
+    }
   }
 
-  function logoutUser() {
+  async function logoutUser() {
+    try {
+      await fetch('api/logout.php', { method: 'POST', credentials: 'same-origin' });
+    } catch (e) { /* ignore */ }
     currentUser = null;
     saveUserToStorage();
     updateCartUI();
