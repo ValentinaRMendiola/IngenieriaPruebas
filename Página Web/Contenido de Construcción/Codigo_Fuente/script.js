@@ -17,27 +17,8 @@
     try { emailjs.init(EMAILJS_PUBLIC_KEY); } catch (e) {}
   }
 
-  // ---------- DATA: productos iniciales ----------
-  const PRODUCTS = [
-    {
-      id: "vinyl-01",
-      title: "Beethoven — Sinfonía No.9 (Ed. Clásica)",
-      artist: "L. van Beethoven",
-      price: 850.00,
-      genre: "Clásica",
-      description: "Edición vinil remasterizada. 180g. Incluye libreto.",
-      coverColor: "#2b2b2b"
-    },
-    {
-      id: "vinyl-02",
-      title: "Debussy — Préludes (Colección)",
-      artist: "C. Debussy",
-      price: 720.00,
-      genre: "Clásica",
-      description: "Selección de preludios. Edición de coleccionista.",
-      coverColor: "#23384a"
-    }
-  ];
+  // ---------- DATA: productos ----------
+  let PRODUCTS = []
 
   // ---------- Utilidades ----------
   const $ = sel => document.querySelector(sel);
@@ -77,9 +58,23 @@
 
   // ---------- Init ----------
   document.getElementById("year").textContent = new Date().getFullYear();
-  renderProducts();
-  loadUserFromStorage();
-  updateCartUI();
+  loadProducts().then(() => {
+    renderProducts();
+    loadUserFromStorage();
+    updateCartUI();
+  });
+
+  // ---------- Load products from JSON ----------
+  async function loadProducts() {
+    try {
+      const res = await fetch('api/products.json');
+      if (!res.ok) throw new Error('Error al cargar productos');
+      PRODUCTS = await res.json();
+    } catch (err) {
+      console.error('No se pudieron cargar los productos:', err);
+      PRODUCTS = [];
+    }
+  }
 
   // ---------- Render products ----------
   function renderProducts() {
@@ -264,13 +259,13 @@
       }
   }
 
-  async function registerUser(name, email, password) {
+  async function registerUser(name, last, email, password) {
     try {
       const res = await fetch('api/register.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'same-origin',
-        body: JSON.stringify({ name, email, password })
+        body: JSON.stringify({ name, last, email, password })
       });
       const data = await res.json();
       if (!data.ok) {
@@ -317,6 +312,25 @@
     updateCartUI();
     loginBtn.textContent = "Iniciar sesión";
   }
+
+  // --- Validación en tiempo real para nombre y apellido ---
+  ["regName", "regLastName"].forEach(id => {
+    const input = document.getElementById(id);
+    input.addEventListener("input", (e) => {
+      // Convertir a mayúsculas
+      let value = e.target.value.toUpperCase();
+
+      // Elimina espacios y caracteres no permitidos (solo letras con acentos y Ñ)
+      value = value.replace(/[^A-ZÁÉÍÓÚÜÑ]/g, "");
+
+      e.target.value = value;
+    });
+
+    // Previene que se escriban espacios directamente (por si acaso)
+    input.addEventListener("keydown", (e) => {
+      if (e.key === " ") e.preventDefault();
+    });
+  });
 
   function onUserChanged() {
     if (currentUser) {
@@ -497,27 +511,38 @@
   });
 
   // register action
-  $("#doRegister").addEventListener("click", ()=> {
-    const name = $("#regName").value.trim();
+  $("#doRegister").addEventListener("click", async ()=> {
+    const name = $("#regName").value.trim().toUpperCase();
+    const last = $("#regLastName").value.trim().toUpperCase();
     const email = $("#regEmail").value.trim();
     const pwd = $("#regPassword").value;
-    if (!name || !email || !pwd) return alert("Completa todos los campos.");
-    if (registerUser(name,email,pwd)) {
+    if (!name || !last || !email || !pwd) return alert("Completa todos los campos.");
+
+    const nameRegex = /^[A-ZÁÉÍÓÚÑ]+$/;
+      if (!nameRegex.test(name) || !nameRegex.test(last)) {
+        return alert("Nombre y apellido sin espacios ni simbolos.");
+      }
+
+    const ok = await registerUser(name, last, email, pwd);
+    if (ok) {
       alert("Cuenta creada. Bienvenido/a " + name);
       authModal.classList.add("hidden");
       onUserChanged();
-    }
+  }
   });
 
   // login action
-  $("#doLogin").addEventListener("click", ()=> {
+  $("#doLogin").addEventListener("click", async ()=> {
     const email = $("#loginEmail").value.trim();
     const pwd = $("#loginPassword").value;
     if (!email || !pwd) return alert("Completa correo y contraseña.");
-    if (!loginUser(email,pwd)) return alert("Credenciales incorrectas.");
-    alert("Sesión iniciada.");
-    authModal.classList.add("hidden");
-    onUserChanged();
+
+    const ok = await loginUser(email, pwd);
+    if (!ok) return alert("Credenciales incorrectas o error al iniciar sesión.");
+    
+      alert("Sesión iniciada.");
+      authModal.classList.add("hidden");
+      onUserChanged();
   });
 
   // cart panel toggles
