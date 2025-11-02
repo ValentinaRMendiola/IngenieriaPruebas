@@ -16,5 +16,41 @@
       "genre": "Clásica",
       "description": "Selección de preludios. Edición de coleccionista.",
       "coverColor": "#23384a"
+    },
+    {
+      "id": "vinyl-03",
+      "title": "Mozart — Conciertos para Piano No. 20 & 21",
+      "artist": "W. A. Mozart",
+      "price": 790.00,
+      "genre": "Clásica",
+      "description": "Interpretación por la Filarmónica de Viena. Vinilo 180g. Sonido analógico puro.",
+      "coverColor": "#3a2a2a"
+    },
+    {
+      "id": "vinyl-04",
+      "title": "Tchaikovsky — El Lago de los Cisnes",
+      "artist": "P. I. Tchaikovsky",
+      "price": 880.00,
+      "genre": "Clásica",
+      "description": "Grabación completa del ballet. Incluye libreto ilustrado.",
+      "coverColor": "#1d2b3c"
+    },
+    {
+      "id": "vinyl-05",
+      "title": "Vivaldi — Las Cuatro Estaciones",
+      "artist": "A. Vivaldi",
+      "price": 810.00,
+      "genre": "Clásica",
+      "description": "Edición limitada. Grabación con instrumentos barrocos originales.",
+      "coverColor": "#473e2c"
+    },
+    {
+      "id": "vinyl-06",
+      "title": "Bach — Suites para Violonchelo Solo",
+      "artist": "J. S. Bach",
+      "price": 940.00,
+      "genre": "Clásica",
+      "description": "Interpretación histórica por Pablo Casals. Doble vinilo 180g.",
+      "coverColor": "#2a2429"
     }
 ]

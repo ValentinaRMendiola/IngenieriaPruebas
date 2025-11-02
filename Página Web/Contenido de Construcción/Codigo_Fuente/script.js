@@ -350,50 +350,71 @@
       openAuthModal();
       return;
     }
+
     const items = getCartForCurrentUser();
     if (!items.length) {
       alert("Tu carrito está vacío.");
       return;
     }
-    const total = cartTotal(items);
-    // Prepare ticket HTML / texto
-    const itemsHtml = items.map(it => `<li>${escapeHtml(it.title)} — ${it.qty} × ${formatMoney(it.price)}</li>`).join("");
-    const plainText = `Ticket VinylShop\nCliente: ${currentUser.name} <${currentUser.email}>\n\nItems:\n${items.map(it => `- ${it.title} x${it.qty} ${formatMoney(it.price)}`).join("\n")}\n\nTotal: ${formatMoney(total)}`;
 
-    // Generate recommendation based on genres purchased
+    const total = cartTotal(items);
+
+    // Ticket visual
+    const itemsHtml = items
+      .map(it => `<li>${escapeHtml(it.title)} — ${it.qty} × ${formatMoney(it.price)}</li>`)
+      .join("");
+
+    const plainText = `Ticket VinylShop\nCliente: ${currentUser.name} <${currentUser.email}>\n\nItems:\n${items
+      .map(it => `- ${it.title} x${it.qty} ${formatMoney(it.price)}`)
+      .join("\n")}\n\nTotal: ${formatMoney(total)}`;
+
+    // Generar recomendación
     const recommendation = generateRecommendation(items);
 
-    // EmailJS send (if configured)
-    const templateParams = {
-      to_name: currentUser.name,
-      to_email: currentUser.email,
-      message_html: `<p>Gracias por tu compra. Aquí tu ticket:</p><ul>${itemsHtml}</ul><p><strong>Total: ${formatMoney(total)}</strong></p><p>Recomendación: ${escapeHtml(recommendation.title || "—")}</p>`,
-      message_plain: plainText,
-      recommendation: recommendation.title || ""
-    };
+    let correoEnviado = false;
 
-    if (EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID && EMAILJS_PUBLIC_KEY && window.emailjs) {
-      try {
-        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
-        alert("Ticket enviado por correo.");
-      } catch (err) {
-        console.error("EmailJS error:", err);
-        alert("No se pudo enviar el correo (ver codigo).");
+    // Enviar correo mediante Brevo (API)
+    try {
+      const res = await fetch("api/sendMail.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: currentUser.name,
+          last: currentUser.last,
+          email: currentUser.email,
+          total: total,
+          items: items,
+          recommendation: recommendation.title || ""
+        })
+      });
+
+      const data = await res.json();
+
+      if (data.ok) {
+        alert("Ticket enviado correctamente a tu correo.");
+      } else {
+        console.error("Brevo error:", data.response || data.msg);
+        alert("No se pudo enviar el correo. Intenta mas tarde");
       }
-    } else {
-      // Simulate: muestra modal de confirmación y guarda la compra en historial local
-      alert("Simulación: ticket PREPARADO. Si configuras EmailJS, el correo se enviará realmente.");
-      console.log("TICKET (simulado):", templateParams);
+    } catch (err) {
+      console.error("Error de conexión:", err);
+      alert("Error de conexión al intentar enviar el correo.");
     }
 
-    // Guardar historial breve
-    savePurchaseHistory(currentUser.email, items, total, recommendation);
-    // vaciar carrito
-    saveCartForCurrentUser([]);
-    updateCartUI();
-    // mostrar recomendación en modal
+    // Solo si el correo fue enviado correctamente
+    if (correoEnviado) {
+      // Guardar historial de compra
+      savePurchaseHistory(currentUser.email, items, total, recommendation);
+
+      // Vaciar carrito y actualizar interfaz
+      saveCartForCurrentUser([]);
+      updateCartUI();
+    }
+
+    // Mostrar recomendación en cualquier caso
     showRecommendationModal(recommendation);
   }
+
 
   // ---------- Recommendations ----------
   function generateRecommendation(items) {
