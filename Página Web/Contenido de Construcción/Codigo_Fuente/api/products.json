@@ -1,0 +1,38 @@
+[
+    {
+      "id": "vinyl-01",
+      "title": "Beethoven — Sinfonía No.9 (Ed. Clásica)",
+      "artist": "L. van Beethoven",
+      "price": 850.00,
+      "genre": "Clásica",
+      "description": "Edición vinil remasterizada. Incluye libreto.",
+      "imagen": "img/Beethoven.jpg"
+    },
+    {
+      "id": "vinyl-02",
+      "title": "Debussy — Préludes (Colección)",
+      "artist": "C. Debussy",
+      "price": 720.00,
+      "genre": "Clásica",
+      "description": "Selección de preludios. Edición de coleccionista.",
+      "imagen": "img/Debussy.jpg"
+    },
+    {
+      "id": "vinyl-03",
+      "title": "Chopin — Classical Piano Masterpieces Vinyl",
+      "artist": "F. Chopin",
+      "price": 600.00,
+      "genre": "Clásica",
+      "description": "Selección de clásicos. Edición master.",
+      "imagen": "img/Chopin.jpg"
+    },
+    {
+      "id": "vinyl-04",
+      "title": "Vinilo Classical Music is not Boring",
+      "artist": "Varios artistas",
+      "price": 500.00,
+      "genre": "Clásica",
+      "description": "Selección de artistas de renombre seleccionados. Edición angel",
+      "imagen": "img/Boring.jpg"
+    }
+]

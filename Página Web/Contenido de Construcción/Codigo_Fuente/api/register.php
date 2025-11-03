@@ -13,10 +13,11 @@ if (!$body) {
 }
 
 $name = trim($body['name'] ?? '');
+$lastname = trim($body['last'] ?? '');
 $email = strtolower(trim($body['email'] ?? ''));
 $password = $body['password'] ?? '';
 
-if (!$name || !$email || !$password) {
+if (!$name || !$lastname || !$email || !$password) {
   http_response_code(400);
   echo json_encode(['ok' => false, 'msg' => 'Completa todos los campos']);
   exit;
@@ -52,6 +53,7 @@ $hash = password_hash($password, PASSWORD_DEFAULT);
 $new = [
     'id' => uniqid('u_', true),
     'name' => $name,
+    'lastname' => $lastname,
     'email' => $email,
     'password_hash' => $hash,
     'created_at' => date('c')

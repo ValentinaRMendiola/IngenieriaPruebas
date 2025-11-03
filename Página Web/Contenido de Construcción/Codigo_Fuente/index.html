@@ -5,8 +5,13 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Tienda Vinil Clásico — VinylShop</title>
   <link rel="stylesheet" href="style.css" />
+  
   <!-- EmailJS SDK (opcional) -->
   <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+<link rel="icon" type="image/png" sizes="32x32" href="img/vinyl-icon.png">
+<link rel="apple-touch-icon" href="img/vinyl-icon.png">
+<link rel="shortcut icon" href="img/vinyl-icon.png">
+
 </head>
 <body>
   <header class="site-header">
@@ -51,7 +56,7 @@
     <!-- Contact -->
     <section id="contacto" class="contact container">
       <h3>Contacto</h3>
-      <p>Tel: +52 55 12 34 56 78 · Email: contactoVinyl@gmail.com</p>
+      <p>Tel: +52 55 12 34 56 78 · Email: contacto.vinylshop@gmail.com</p>
       <p>Dirección: Ciudad, México</p>
     </section>
   </main>
@@ -85,17 +90,20 @@
       <div id="registerForm" class="auth-form hidden">
         <h4>Regístrate</h4>
         <label>Nombre
-          <input id="regName" type="text" placeholder="Tu nombre" />
+          <input id="regName" type="text" placeholder="Tu nombre" required />
+        </label>
+        <label>Apellido
+          <input id="regLastName" type="text" placeholder="Tu apellido" required />
         </label>
         <label>Email
-          <input id="regEmail" type="email" placeholder="correo@ejemplo.com" />
+          <input id="regEmail" type="email" placeholder="correo@ejemplo.com" required />
         </label>
         <label>Contraseña
-          <input id="regPassword" type="password" placeholder="******" />
+          <input id="regPassword" type="password" placeholder="******" required minlength="6" />
         </label>
         <button id="doRegister" class="btn">Crear cuenta</button>
       </div>
-      <p class="auth-note">Los datos se guardan localmente.</p>
+      <p class="auth-note"></p>
     </div>
   </div>
 

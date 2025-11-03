@@ -17,27 +17,8 @@
     try { emailjs.init(EMAILJS_PUBLIC_KEY); } catch (e) {}
   }
 
-  // ---------- DATA: productos iniciales ----------
-  const PRODUCTS = [
-    {
-      id: "vinyl-01",
-      title: "Beethoven — Sinfonía No.9 (Ed. Clásica)",
-      artist: "L. van Beethoven",
-      price: 850.00,
-      genre: "Clásica",
-      description: "Edición vinil remasterizada. 180g. Incluye libreto.",
-      coverColor: "#2b2b2b"
-    },
-    {
-      id: "vinyl-02",
-      title: "Debussy — Préludes (Colección)",
-      artist: "C. Debussy",
-      price: 720.00,
-      genre: "Clásica",
-      description: "Selección de preludios. Edición de coleccionista.",
-      coverColor: "#23384a"
-    }
-  ];
+  // ---------- DATA: productos ----------
+  let PRODUCTS = []
 
   // ---------- Utilidades ----------
   const $ = sel => document.querySelector(sel);
@@ -77,46 +58,58 @@
 
   // ---------- Init ----------
   document.getElementById("year").textContent = new Date().getFullYear();
-  renderProducts();
-  loadUserFromStorage();
-  updateCartUI();
+  loadProducts().then(() => {
+    renderProducts();
+    loadUserFromStorage();
+    updateCartUI();
+  });
+
+  // ---------- Load products from JSON ----------
+  async function loadProducts() {
+    try {
+      const res = await fetch('api/products.json');
+      if (!res.ok) throw new Error('Error al cargar productos');
+      PRODUCTS = await res.json();
+    } catch (err) {
+      console.error('No se pudieron cargar los productos:', err);
+      PRODUCTS = [];
+    }
+  }
 
   // ---------- Render products ----------
-  function renderProducts() {
-    productGrid.innerHTML = "";
-    PRODUCTS.forEach(p => {
-      const card = document.createElement("article");
-      card.className = "product-card";
-      card.innerHTML = `
-        <div class="album-art" style="background: linear-gradient(180deg, ${shade(p.coverColor, -12)}, ${shade(p.coverColor, -35)});">
-          <div style="text-align:center;padding:0.5rem">
-            <div style="font-size:0.9rem">${shortTitle(p.title)}</div>
-            <div style="font-size:0.7rem;margin-top:6px">${p.artist}</div>
+ function renderProducts() {
+  productGrid.innerHTML = "";
+  PRODUCTS.forEach(p => {
+    const card = document.createElement("article");
+    card.className = "product-card";
+    card.innerHTML = `
+      <div class="album-art">
+        <img src="${p.imagen}" alt="${p.title}">
+      </div>
+      <div class="product-info">
+        <div class="product-title">${p.title}</div>
+        <div class="product-meta">${p.artist} · ${p.genre}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+          <div class="price">${formatMoney(p.price)}</div>
+          <div class="product-actions">
+            <button class="btn" data-action="add" data-id="${p.id}">Añadir</button>
           </div>
         </div>
-        <div class="product-info">
-          <div class="product-title">${p.title}</div>
-          <div class="product-meta">${p.artist} · ${p.genre}</div>
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
-            <div class="price">${formatMoney(p.price)}</div>
-            <div class="product-actions">
-              <button class="btn" data-action="add" data-id="${p.id}">Añadir</button>
-            </div>
-          </div>
-          <p style="margin-top:8px;font-size:0.86rem;color:#b9b09b">${p.description}</p>
-        </div>
-      `;
-      productGrid.appendChild(card);
-    });
+        <p style="margin-top:8px;font-size:0.86rem;color:#b9b09b">${p.description}</p>
+      </div>
+    `;
+    productGrid.appendChild(card);
+  });
 
-    // attach events for add buttons
-    $$(".product-card button[data-action='add']").forEach(btn => {
-      btn.addEventListener("click", e => {
-        const id = e.currentTarget.dataset.id;
-        addToCart(id, 1);
-      });
+  // attach events for add buttons
+  $$(".product-card button[data-action='add']").forEach(btn => {
+    btn.addEventListener("click", e => {
+      const id = e.currentTarget.dataset.id;
+      addToCart(id, 1);
     });
-  }
+  });
+}
+
 
   // ---------- Cart functions ----------
   function getCartForCurrentUser() {
@@ -264,13 +257,13 @@
       }
   }
 
-  async function registerUser(name, email, password) {
+  async function registerUser(name, last, email, password) {
     try {
       const res = await fetch('api/register.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'same-origin',
-        body: JSON.stringify({ name, email, password })
+        body: JSON.stringify({ name, last, email, password })
       });
       const data = await res.json();
       if (!data.ok) {
@@ -318,6 +311,25 @@
     loginBtn.textContent = "Iniciar sesión";
   }
 
+  // --- Validación en tiempo real para nombre y apellido ---
+  ["regName", "regLastName"].forEach(id => {
+    const input = document.getElementById(id);
+    input.addEventListener("input", (e) => {
+      // Convertir a mayúsculas
+      let value = e.target.value.toUpperCase();
+
+      // Elimina espacios y caracteres no permitidos (solo letras con acentos y Ñ)
+      value = value.replace(/[^A-ZÁÉÍÓÚÜÑ]/g, "");
+
+      e.target.value = value;
+    });
+
+    // Previene que se escriban espacios directamente (por si acaso)
+    input.addEventListener("keydown", (e) => {
+      if (e.key === " ") e.preventDefault();
+    });
+  });
+
   function onUserChanged() {
     if (currentUser) {
       loginBtn.textContent = `Hola, ${currentUser.name}`;
@@ -336,50 +348,71 @@
       openAuthModal();
       return;
     }
+
     const items = getCartForCurrentUser();
     if (!items.length) {
       alert("Tu carrito está vacío.");
       return;
     }
-    const total = cartTotal(items);
-    // Prepare ticket HTML / texto
-    const itemsHtml = items.map(it => `<li>${escapeHtml(it.title)} — ${it.qty} × ${formatMoney(it.price)}</li>`).join("");
-    const plainText = `Ticket VinylShop\nCliente: ${currentUser.name} <${currentUser.email}>\n\nItems:\n${items.map(it => `- ${it.title} x${it.qty} ${formatMoney(it.price)}`).join("\n")}\n\nTotal: ${formatMoney(total)}`;
 
-    // Generate recommendation based on genres purchased
+    const total = cartTotal(items);
+
+    // Ticket visual
+    const itemsHtml = items
+      .map(it => `<li>${escapeHtml(it.title)} — ${it.qty} × ${formatMoney(it.price)}</li>`)
+      .join("");
+
+    const plainText = `Ticket VinylShop\nCliente: ${currentUser.name} <${currentUser.email}>\n\nItems:\n${items
+      .map(it => `- ${it.title} x${it.qty} ${formatMoney(it.price)}`)
+      .join("\n")}\n\nTotal: ${formatMoney(total)}`;
+
+    // Generar recomendación
     const recommendation = generateRecommendation(items);
 
-    // EmailJS send (if configured)
-    const templateParams = {
-      to_name: currentUser.name,
-      to_email: currentUser.email,
-      message_html: `<p>Gracias por tu compra. Aquí tu ticket:</p><ul>${itemsHtml}</ul><p><strong>Total: ${formatMoney(total)}</strong></p><p>Recomendación: ${escapeHtml(recommendation.title || "—")}</p>`,
-      message_plain: plainText,
-      recommendation: recommendation.title || ""
-    };
+    let correoEnviado = false;
 
-    if (EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID && EMAILJS_PUBLIC_KEY && window.emailjs) {
-      try {
-        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
-        alert("Ticket enviado por correo.");
-      } catch (err) {
-        console.error("EmailJS error:", err);
-        alert("No se pudo enviar el correo (ver codigo).");
+    // Enviar correo mediante Brevo (API)
+    try {
+      const res = await fetch("api/sendMail.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: currentUser.name,
+          last: currentUser.last,
+          email: currentUser.email,
+          total: total,
+          items: items,
+          recommendation: recommendation.title || ""
+        })
+      });
+
+      const data = await res.json();
+
+      if (data.ok) {
+        alert("Ticket enviado correctamente a tu correo.");
+      } else {
+        console.error("Brevo error:", data.response || data.msg);
+        alert("No se pudo enviar el correo. Intenta mas tarde");
       }
-    } else {
-      // Simulate: muestra modal de confirmación y guarda la compra en historial local
-      alert("Simulación: ticket PREPARADO. Si configuras EmailJS, el correo se enviará realmente.");
-      console.log("TICKET (simulado):", templateParams);
+    } catch (err) {
+      console.error("Error de conexión:", err);
+      alert("Error de conexión al intentar enviar el correo.");
     }
 
-    // Guardar historial breve
-    savePurchaseHistory(currentUser.email, items, total, recommendation);
-    // vaciar carrito
-    saveCartForCurrentUser([]);
-    updateCartUI();
-    // mostrar recomendación en modal
+    // Solo si el correo fue enviado correctamente
+    if (correoEnviado) {
+      // Guardar historial de compra
+      savePurchaseHistory(currentUser.email, items, total, recommendation);
+
+      // Vaciar carrito y actualizar interfaz
+      saveCartForCurrentUser([]);
+      updateCartUI();
+    }
+
+    // Mostrar recomendación en cualquier caso
     showRecommendationModal(recommendation);
   }
+
 
   // ---------- Recommendations ----------
   function generateRecommendation(items) {
@@ -497,27 +530,55 @@
   });
 
   // register action
-  $("#doRegister").addEventListener("click", ()=> {
-    const name = $("#regName").value.trim();
-    const email = $("#regEmail").value.trim();
-    const pwd = $("#regPassword").value;
-    if (!name || !email || !pwd) return alert("Completa todos los campos.");
-    if (registerUser(name,email,pwd)) {
-      alert("Cuenta creada. Bienvenido/a " + name);
-      authModal.classList.add("hidden");
-      onUserChanged();
-    }
-  });
+  $("#doRegister").addEventListener("click", async ()=> {
+  const name = $("#regName").value.trim().toUpperCase();
+  const last = $("#regLastName").value.trim().toUpperCase();
+  const email = $("#regEmail").value.trim();
+  const pwd = $("#regPassword").value;
+
+  if (!name || !last || !email || !pwd) {
+    alert("Por favor completa todos los campos requeridos.");
+    return;
+  }
+
+  const nameRegex = /^[A-ZÁÉÍÓÚÑ]+$/;
+  if (!nameRegex.test(name) || !nameRegex.test(last)) {
+    alert("El nombre y apellido solo pueden contener letras (sin espacios ni símbolos).");
+    return;
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    alert("Por favor ingresa un correo electrónico válido.");
+    return;
+  }
+
+  if (pwd.length < 6) {
+    alert("La contraseña debe tener al menos 6 caracteres.");
+    return;
+  }
+
+  const ok = await registerUser(name, last, email, pwd);
+  if (ok) {
+    alert(`Cuenta creada correctamente. ¡Bienvenido/a ${name}!`);
+    authModal.classList.add("hidden");
+    onUserChanged();
+  }
+});
+
 
   // login action
-  $("#doLogin").addEventListener("click", ()=> {
+  $("#doLogin").addEventListener("click", async ()=> {
     const email = $("#loginEmail").value.trim();
     const pwd = $("#loginPassword").value;
     if (!email || !pwd) return alert("Completa correo y contraseña.");
-    if (!loginUser(email,pwd)) return alert("Credenciales incorrectas.");
-    alert("Sesión iniciada.");
-    authModal.classList.add("hidden");
-    onUserChanged();
+
+    const ok = await loginUser(email, pwd);
+    if (!ok) return alert("Credenciales incorrectas o error al iniciar sesión.");
+    
+      alert("Sesión iniciada.");
+      authModal.classList.add("hidden");
+      onUserChanged();
   });
 
   // cart panel toggles
