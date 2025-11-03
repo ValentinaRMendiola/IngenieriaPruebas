@@ -5,8 +5,8 @@
       "artist": "L. van Beethoven",
       "price": 850.00,
       "genre": "Clásica",
-      "description": "Edición vinil remasterizada. 180g. Incluye libreto.",
-      "coverColor": "#2b2b2b"
+      "description": "Edición vinil remasterizada. Incluye libreto.",
+      "imagen": "img/Beethoven.jpg"
     },
     {
       "id": "vinyl-02",
@@ -15,42 +15,24 @@
       "price": 720.00,
       "genre": "Clásica",
       "description": "Selección de preludios. Edición de coleccionista.",
-      "coverColor": "#23384a"
+      "imagen": "img/Debussy.jpg"
     },
     {
       "id": "vinyl-03",
-      "title": "Mozart — Conciertos para Piano No. 20 & 21",
-      "artist": "W. A. Mozart",
-      "price": 790.00,
+      "title": "Chopin — Classical Piano Masterpieces Vinyl",
+      "artist": "F. Chopin",
+      "price": 600.00,
       "genre": "Clásica",
-      "description": "Interpretación por la Filarmónica de Viena. Vinilo 180g. Sonido analógico puro.",
-      "coverColor": "#3a2a2a"
+      "description": "Selección de clásicos. Edición master.",
+      "imagen": "img/Chopin.jpg"
     },
     {
       "id": "vinyl-04",
-      "title": "Tchaikovsky — El Lago de los Cisnes",
-      "artist": "P. I. Tchaikovsky",
-      "price": 880.00,
+      "title": "Vinilo Classical Music is not Boring",
+      "artist": "Varios artistas",
+      "price": 500.00,
       "genre": "Clásica",
-      "description": "Grabación completa del ballet. Incluye libreto ilustrado.",
-      "coverColor": "#1d2b3c"
-    },
-    {
-      "id": "vinyl-05",
-      "title": "Vivaldi — Las Cuatro Estaciones",
-      "artist": "A. Vivaldi",
-      "price": 810.00,
-      "genre": "Clásica",
-      "description": "Edición limitada. Grabación con instrumentos barrocos originales.",
-      "coverColor": "#473e2c"
-    },
-    {
-      "id": "vinyl-06",
-      "title": "Bach — Suites para Violonchelo Solo",
-      "artist": "J. S. Bach",
-      "price": 940.00,
-      "genre": "Clásica",
-      "description": "Interpretación histórica por Pablo Casals. Doble vinilo 180g.",
-      "coverColor": "#2a2429"
+      "description": "Selección de artistas de renombre seleccionados. Edición angel",
+      "imagen": "img/Boring.jpg"
     }
 ]
