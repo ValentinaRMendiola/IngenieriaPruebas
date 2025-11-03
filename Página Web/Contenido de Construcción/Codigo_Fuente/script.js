@@ -77,41 +77,39 @@
   }
 
   // ---------- Render products ----------
-  function renderProducts() {
-    productGrid.innerHTML = "";
-    PRODUCTS.forEach(p => {
-      const card = document.createElement("article");
-      card.className = "product-card";
-      card.innerHTML = `
-        <div class="album-art" style="background: linear-gradient(180deg, ${shade(p.coverColor, -12)}, ${shade(p.coverColor, -35)});">
-          <div style="text-align:center;padding:0.5rem">
-            <div style="font-size:0.9rem">${shortTitle(p.title)}</div>
-            <div style="font-size:0.7rem;margin-top:6px">${p.artist}</div>
+ function renderProducts() {
+  productGrid.innerHTML = "";
+  PRODUCTS.forEach(p => {
+    const card = document.createElement("article");
+    card.className = "product-card";
+    card.innerHTML = `
+      <div class="album-art">
+        <img src="${p.imagen}" alt="${p.title}">
+      </div>
+      <div class="product-info">
+        <div class="product-title">${p.title}</div>
+        <div class="product-meta">${p.artist} · ${p.genre}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+          <div class="price">${formatMoney(p.price)}</div>
+          <div class="product-actions">
+            <button class="btn" data-action="add" data-id="${p.id}">Añadir</button>
           </div>
         </div>
-        <div class="product-info">
-          <div class="product-title">${p.title}</div>
-          <div class="product-meta">${p.artist} · ${p.genre}</div>
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
-            <div class="price">${formatMoney(p.price)}</div>
-            <div class="product-actions">
-              <button class="btn" data-action="add" data-id="${p.id}">Añadir</button>
-            </div>
-          </div>
-          <p style="margin-top:8px;font-size:0.86rem;color:#b9b09b">${p.description}</p>
-        </div>
-      `;
-      productGrid.appendChild(card);
-    });
+        <p style="margin-top:8px;font-size:0.86rem;color:#b9b09b">${p.description}</p>
+      </div>
+    `;
+    productGrid.appendChild(card);
+  });
 
-    // attach events for add buttons
-    $$(".product-card button[data-action='add']").forEach(btn => {
-      btn.addEventListener("click", e => {
-        const id = e.currentTarget.dataset.id;
-        addToCart(id, 1);
-      });
+  // attach events for add buttons
+  $$(".product-card button[data-action='add']").forEach(btn => {
+    btn.addEventListener("click", e => {
+      const id = e.currentTarget.dataset.id;
+      addToCart(id, 1);
     });
-  }
+  });
+}
+
 
   // ---------- Cart functions ----------
   function getCartForCurrentUser() {
@@ -512,24 +510,41 @@
 
   // register action
   $("#doRegister").addEventListener("click", async ()=> {
-    const name = $("#regName").value.trim().toUpperCase();
-    const last = $("#regLastName").value.trim().toUpperCase();
-    const email = $("#regEmail").value.trim();
-    const pwd = $("#regPassword").value;
-    if (!name || !last || !email || !pwd) return alert("Completa todos los campos.");
+  const name = $("#regName").value.trim().toUpperCase();
+  const last = $("#regLastName").value.trim().toUpperCase();
+  const email = $("#regEmail").value.trim();
+  const pwd = $("#regPassword").value;
 
-    const nameRegex = /^[A-ZÁÉÍÓÚÑ]+$/;
-      if (!nameRegex.test(name) || !nameRegex.test(last)) {
-        return alert("Nombre y apellido sin espacios ni simbolos.");
-      }
-
-    const ok = await registerUser(name, last, email, pwd);
-    if (ok) {
-      alert("Cuenta creada. Bienvenido/a " + name);
-      authModal.classList.add("hidden");
-      onUserChanged();
+  if (!name || !last || !email || !pwd) {
+    alert("Por favor completa todos los campos requeridos.");
+    return;
   }
-  });
+
+  const nameRegex = /^[A-ZÁÉÍÓÚÑ]+$/;
+  if (!nameRegex.test(name) || !nameRegex.test(last)) {
+    alert("El nombre y apellido solo pueden contener letras (sin espacios ni símbolos).");
+    return;
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    alert("Por favor ingresa un correo electrónico válido.");
+    return;
+  }
+
+  if (pwd.length < 6) {
+    alert("La contraseña debe tener al menos 6 caracteres.");
+    return;
+  }
+
+  const ok = await registerUser(name, last, email, pwd);
+  if (ok) {
+    alert(`Cuenta creada correctamente. ¡Bienvenido/a ${name}!`);
+    authModal.classList.add("hidden");
+    onUserChanged();
+  }
+});
+
 
   // login action
   $("#doLogin").addEventListener("click", async ()=> {
